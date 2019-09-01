@@ -61,4 +61,10 @@ var tRemainder = diffTime % trainFreq;
 var tMinutesToTrain = trainFreq - tRemainder;
 
 var nextTrain = moment().add(tMinutesToTrain, "minutes");
+
+$("#train-table > tbody").append("<tr><td>" + trainName + "</td><td>" + trainDest + "</td><td>" + trainFreq + 
+"</td><td>" + moment(nextTrain).format("HH:mm") + "</td><td>" + tMinutesTillTrain + "</td></tr>");
+});
+
+
 });
