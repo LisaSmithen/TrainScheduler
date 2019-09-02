@@ -17,6 +17,8 @@ firebase.initializeApp(firebaseConfig);
 var database = firebase.database();
 //Create the onclick event vars and grab user info function
 
+
+
 $("#add-train-btn").on("click", function(event) {
     event.preventDefault();
 
@@ -26,12 +28,13 @@ $("#add-train-btn").on("click", function(event) {
  frequency = $("#freq-input").val().trim();
 
 
-var newTrain = {
-trainName: firstTrainName,
-trainDestination: tdestination,
-trainTime: firstTrainTime,
-trainFrequency: tfrequency,
-};
+ var newTrain = {
+    trainName: firstTrainName,
+    trainDestination: tdestination,
+    trainTime: firstTrainTime,
+    trainFrequency: tfrequency,
+    };
+
 
 //Push train information to database
 database.ref().push(newTrain);
