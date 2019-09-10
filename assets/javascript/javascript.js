@@ -17,57 +17,59 @@ firebase.initializeApp(firebaseConfig);
 var database = firebase.database();
 //Create the onclick event vars and grab user info function
 
+    var name;
+    var destination;
+    var firstTrainTime;
+    var frequency = 0;
 
-
-$("#add-train-btn").on("click", function(event) {
+$("#add-train-btn").on("click", function() {
     event.preventDefault();
+ name = $("#train-name").val().trim();
+ destinantion = $("#train-dest").val().trim();
+ firstTrainTime = $("#first-time").val().trim();
+ frequency = $("#freq").val().trim();
 
- firstTrainName = $("#train-name-input").val().trim();
- destinantion = $("#train-dest-input").val().trim();
- firstTrainTime = $("#first-time-input").val().trim();
- frequency = $("#freq-input").val().trim();
-
-
- var newTrain = {
-    trainName: firstTrainName,
-    trainDestination: tdestination,
-    trainTime: firstTrainTime,
-    trainFrequency: tfrequency,
-    };
-
-
+ 
 //Push train information to database
-database.ref().push(newTrain);
+database.ref().push({
 
+name: name,
+destination: destination,
+firstTrainTime: firstTrainTime,
+frequency: frequency,
+dateAdded: firebase.database.ServerValue.TIMESTAMP
+});
 
-
-
+$("form")[0].reset();
 });
 //Snapshottime
-database.ref().on("child_added", function(childSnapshot, prevChildKey) {
+//database.ref().orderByChild("dataAdded").limitToLast(1).on("child_added"), function(snapshat) {
+database.ref().on("child_added", function(childSnapshot) {
+   var nextArr;
+    var minAway;
 //Child added function using Snapshot and moment to show the difference between the train times
-var firstTrainName = childSnapshot.val().trainName;
-var tdestination = childSnapshot.val().trainDestination;
-var firstTraintime = childSnapshot.val().trainTime;
-var tfrequency = childSnapshot.val().trainFrequency;
+var firstTrainNew = moment(childSnapshot.val().firstTrain, "hh:mm").subtract(1, "years");
+var diffTime = moment().diff(moment(firstTrainNew), "minutes");
+var remainder = diffTime % childSnapshot.val().frequency;
+var minAway = childSnapshot.val().frequency - remainder;
+var nextTrain = moment().add(minAway, "minutes");
+nextTrain = moment(nextTrain).format("hh:mm");
+
 //Append the destinantion, frequency, next train etc
 
-var firstTime = 0;
-varfirstTimeUpdated = moment(firstTime, "HH:mm").subtract(1, "years");
-
-var diffTime = moment();
-varnewTime = moment().diff(moment(firstTimeUpdated), "minutes");
-
-var trainFreq;
-var tRemainder = diffTime % trainFreq;
-
-var tMinutesToTrain = trainFreq - tRemainder;
-
-var nextTrain = moment().add(tMinutesToTrain, "minutes");
-
-$("#train-table > tbody").append("<tr><td>" + trainName + "</td><td>" + trainDest + "</td><td>" + trainFreq + 
-"</td><td>" + moment(nextTrain).format("HH:mm") + "</td><td>" + tMinutesTillTrain + "</td></tr>");
+$("#add-row").append("<tr><td>" + childSnapshot.val().name +
+"</td><td>" + childSnapshot.val().destination +
+"</td><td>" + childSnapshot.val().frequency +
+"</td><td>" + nextTrain + 
+"</td><td>" + minutesAway + "</td></tr>");
 });
 
 
+
+database.ref().orderByChild("dateAdded").limitToLast(1).on("child_added", function(snapshot) {
+$("#name-display").html(snapshot.val().name);
+$("#email-display").html(snapshot.val().email);
+$("#age-display").html(snapshot.val().age);
+$("#comment-display").html(snapshot.val().comment);
+});
 });
